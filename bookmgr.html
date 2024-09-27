@@ -1,12 +1,67 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GFG</title>
+    <title>Bookmarks MGR</title>
+    <style>
+        .bookmark {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .bookmark img {
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Bookmgr</h1>
+    <h1>Bookmarks</h1>
+    <div id="bookmarks"></div>
+
+    <script>
+        async function fetchCSV() {
+            const response = await fetch('bookmarks.csv');
+            const data = await response.text();
+            return data;
+        }
+
+        function parseCSV(data) {
+            const lines = data.split('\n');
+            const headers = lines[0].split(',');
+            const bookmarks = lines.slice(1).map(line => {
+                const values = line.split(',');
+                let bookmark = {};
+                headers.forEach((header, index) => {
+                    bookmark[header] = values[index];
+                });
+                return bookmark;
+            });
+            return bookmarks;
+        }
+
+        function displayBookmarks(bookmarks) {
+            const container = document.getElementById('bookmarks');
+            bookmarks.forEach(bookmark => {
+                const div = document.createElement('div');
+                div.className = 'bookmark';
+                div.innerHTML = `
+                    <img src="${bookmark.image}" alt="${bookmark.name}">
+                    <a href="${bookmark.url}" target="_blank">${bookmark.name}</a>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        async function init() {
+            const csvData = await fetchCSV();
+            const bookmarks = parseCSV(csvData);
+            displayBookmarks(bookmarks);
+        }
+
+        init();
+    </script>
 </body>
 </html>
